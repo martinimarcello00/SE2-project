@@ -39,7 +39,8 @@ sig Battle {
 sig Team {
     students: set Student,
     battle: one Battle,
-    score: one Score
+    score: one Score,
+    enrollmentTime: one DateTime
 }
 
 sig Score {
@@ -61,38 +62,25 @@ sig Project {
 
 // A DateTime signature to represent a point in time
 sig DateTime {
-  year: Int,
-  month: Int,
-  day: Int,
-  hour: Int,
-  minute: Int
+  year: one Int,
+  month: one Int,
+  day: one Int,
+  hour: one Int,
+  minute: one Int
 }
 
 sig TestCase {}
 sig BuildScript {}
 sig ScoreConfig {}
 
-fact allProjectsHaveTestCases {
-  all p: Project | some p.testCases
-}
-
-fact noDuplicateTestCasesInProject {
-  all p: Project | all disj tc1, tc2: p.testCases | tc1 != tc2
-}
-
-// Students can be in one team in each battle
-fact studentInOneTeamPerBattle {
-  all s: Student | all disj t1, t2: s.teams | t1.battle != t2.battle
-}
-
+// ###################################### FACTS ####################################
 // A fact to ensure DateTime values are valid
 fact validDateTime {
-  all dt: DateTime | 
-    dt.year > 0 and
-    dt.month in 1..12 and
-    dt.day in 1..31 and
-    dt.hour in 0..23 and
-    dt.minute in 0..59
+  all dt: DateTime | (dt.year > 0) and 
+    (dt.month >= 1 and dt.month <= 12) and
+    (dt.day >= 1 and dt.day <= 31) and // it is not completely accurate since months have different number of days, but for easyness of notation we are not accounting for it
+    (dt.hour >= 0 and dt.hour <= 23) and
+    (dt.minute >= 0 and dt.minute <= 59)
 }
 
 // A predicate to check if a DateTime is before another
@@ -104,15 +92,31 @@ pred isBefore[d1, d2: DateTime] {
   (d1.year = d2.year and d1.month = d2.month and d1.day = d2.day and d1.hour = d2.hour and d1.minute < d2.minute)
 }
 
-// A fact to ensure students can't enroll in a battle after the deadline
-fact studentsCantEnrollAfterDeadline {
-  all s: Student, b: Battle, t: Team |
-    (s in t.students and t in b.teams) implies isBefore[s.enrollmentTime, b.registrationDeadline]
+// teams can't enroll in a battle after the deadline
+fact TeamsCantEnrollAfterDeadline {
+  all b: Battle, t: Team |
+    (t in b.teams) implies isBefore[t.enrollmentTime, b.registrationDeadline]
 }
 
-assert checkIsBefore {
-  some d1, d2: DateTime | isBefore[d1, d2]
+// Students can be in one team in each battle
+fact studentInOneTeamPerBattle {
+  all s: Student | all disj t1, t2: s.teams | t1.battle != t2.battle
 }
 
-// Then you can check this assertion
-check checkIsBefore for 5
+// solutions can not be submitted after the deadline
+
+// students can't send solutions to a battle they are not enrolled in
+
+// instructors can't close a tournament that is already closed
+
+// instructors can't close a battle that is already closed
+
+
+
+fact allProjectsHaveTestCases {
+  all p: Project | some p.testCases
+}
+
+fact noDuplicateTestCasesInProject {
+  all p: Project | all disj tc1, tc2: p.testCases | tc1 != tc2
+}
