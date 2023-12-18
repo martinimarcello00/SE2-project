@@ -110,19 +110,19 @@ pred closeTournament [t: Tournament] {
 // ###################################### FACTS ######################################
 
 // A fact to ensure DateTime values are valid
-// fact validDateTime {
-//   all dt: DateTime | (dt.year > 0) and 
-//     (dt.month >= 1 and dt.month <= 12) and
-//     (dt.day >= 1 and dt.day <= 31) and // it is not completely accurate since months have different number of days, but for easyness of notation we are not accounting for it
-//     (dt.hour >= 0 and dt.hour <= 23) and
-//     (dt.minute >= 0 and dt.minute <= 59)
-// }
+fact validDateTime {
+  all dt: DateTime | (dt.year > 0) and 
+    (dt.month >= 1 and dt.month <= 12) and
+    (dt.day >= 1 and dt.day <= 31) and // it is not completely accurate since months have different number of days, but for easyness of notation we are not accounting for it
+    (dt.hour >= 0 and dt.hour <= 23) and
+    (dt.minute >= 0 and dt.minute <= 59)
+}
 
 // A fact to ensure Score values are valid
-// fact validScoreValues {
-//     all sc: Score | sc.functional + sc.timeliness + sc.quality + sc.personal <= 100 and
-//     sc.functional + sc.timeliness + sc.quality + sc.personal >= 0
-// }
+fact validScoreValues {
+    all sc: Score | sc.functional + sc.timeliness + sc.quality + sc.personal <= 100 and
+    sc.functional + sc.timeliness + sc.quality + sc.personal >= 0
+}
 
 // Teams can't enroll in a battle after the deadline
 fact teamsCantEnrollAfterDeadline {
