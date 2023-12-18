@@ -220,6 +220,11 @@ fact solutionEventuallyEvaluated {
     all s: Solution | always (s.status = Submitted implies eventually s.status = Evaluated)
 }
 
+// The creator of a tournament cannot be an assistant instructor
+fact noAssistantCreator {
+    all t: Tournament | t.creator not in t.assistants
+}
+
 pred showStudentSubmitsSolution {
   some s: Solution, st: Student, t: Team, b: Battle, k: Kata, currentTime: DateTime |
     st in t.students and
